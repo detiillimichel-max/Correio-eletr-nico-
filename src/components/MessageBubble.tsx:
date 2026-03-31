@@ -1,0 +1,152 @@
+import React from 'react'
+import type { Message } from '../types/database'
+
+interface Props {
+  message: Message
+  isMine: boolean
+}
+
+export function MessageBubble({ message: m, isMine }: Props) {
+  const tempo = new Date(m.created_at).toLocaleTimeString('pt-BR', {
+    hour: '2-digit', minute: '2-digit'
+  })
+
+  const base = `max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-md ${
+    isMine
+      ? 'bg-gemini-mine rounded-br-sm ml-auto'
+      : 'bg-gemini-bubble rounded-bl-sm mr-auto'
+  }`
+
+  // Chamada de voz
+  if (m.type === 'call_made' || m.type === 'call_missed') {
+    const missed = m.type === 'call_missed'
+    return (
+      <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-1`}>
+        <div className={`${base} flex items-center gap-3 pr-4`}>
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+            missed ? 'bg-red-500/20' : 'bg-green-500/20'
+          }`}>
+            <i className={`fa-solid ${
+              missed ? 'fa-phone-missed text-red-400' : 'fa-phone text-green-400'
+            } text-lg`} />
+          </div>
+          <div>
+            <div className="text-gemini-text font-medium">
+              {missed ? 'Chamada perdida' : 'Chamada de voz'}
+            </div>
+            <div className="text-gemini-muted text-xs">{tempo}</div>
+          </div>
+          <button
+            className="ml-2 text-gemini-blue hover:opacity-80"
+            onClick={() => {
+              window.OioSom?.ligando()
+              if (navigator.vibrate) navigator.vibrate([500])
+            }}
+          >
+            <i className="fa-solid fa-phone text-lg" />
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Localização
+  if (m.type === 'location') {
+    return (
+      <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-1`}>
+        <div className={base}>
+          <a
+            href={m.file_url || '#'}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 text-gemini-blue"
+          >
+            <i className="fa-solid fa-location-dot text-xl" />
+            <span>Ver localização</span>
+          </a>
+          <div className="text-gemini-muted text-xs text-right mt-1">{tempo}</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Imagem
+  if (m.type === 'image') {
+    return (
+      <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-1`}>
+        <div className={base}>
+          <img
+            src={m.file_url || ''}
+            alt="imagem"
+            className="rounded-xl max-w-full max-h-64 object-cover"
+          />
+          <div className="text-gemini-muted text-xs text-right mt-1">{tempo}</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Vídeo
+  if (m.type === 'video') {
+    return (
+      <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-1`}>
+        <div className={base}>
+          <video controls className="rounded-xl max-w-full max-h-64">
+            <source src={m.file_url || ''} />
+          </video>
+          <div className="text-gemini-muted text-xs text-right mt-1">{tempo}</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Áudio
+  if (m.type === 'audio') {
+    return (
+      <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-1`}>
+        <div className={`${base} flex items-center gap-2`}>
+          <i className="fa-solid fa-headphones text-gemini-purple text-xl" />
+          <audio controls src={m.file_url || ''} className="max-w-[200px]" />
+          <div className="text-gemini-muted text-xs">{tempo}</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Documento
+  if (m.type === 'document') {
+    return (
+      <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-1`}>
+        <div className={base}>
+          <a
+            href={m.file_url || '#'}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 text-gemini-blue"
+          >
+            <i className="fa-solid fa-file-lines text-xl text-orange-400" />
+            <span className="truncate max-w-[180px]">{m.content}</span>
+          </a>
+          <div className="text-gemini-muted text-xs text-right mt-1">{tempo}</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Texto padrão
+  return (
+    <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-1`}>
+      <div className={base}>
+        <p className="text-gemini-text leading-relaxed">{m.content}</p>
+        <div className="flex items-center justify-end gap-1 mt-1">
+          <span className="text-gemini-muted text-xs">{tempo}</span>
+          {isMine && (
+            <i className={`fa-solid fa-check-double text-xs ${
+              m.is_read ? 'text-gemini-blue' : 'text-gemini-muted'
+            }`} />
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
