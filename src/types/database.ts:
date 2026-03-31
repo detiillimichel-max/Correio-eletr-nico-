@@ -1,0 +1,63 @@
+export type MessageType =
+  | 'text'
+  | 'image'
+  | 'video'
+  | 'audio'
+  | 'document'
+  | 'location'
+  | 'contact'
+  | 'poll'
+  | 'event'
+  | 'call_missed'
+  | 'call_made'
+
+export interface Profile {
+  id: string
+  username: string
+  avatar_url: string | null
+  status: string | null
+  created_at: string
+}
+
+export interface Message {
+  id: number
+  sender_id: string
+  receiver_id: string
+  content: string | null
+  type: MessageType
+  file_url: string | null
+  duration: number | null
+  is_read: boolean
+  created_at: string
+}
+
+export interface Chat {
+  id: number
+  participant_a: string
+  participant_b: string
+  last_message: string | null
+  last_message_at: string | null
+  created_at: string
+}
+
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: Profile
+        Insert: Omit<Profile, 'created_at'>
+        Update: Partial<Profile>
+      }
+      messages: {
+        Row: Message
+        Insert: Omit<Message, 'id' | 'created_at'>
+        Update: Partial<Message>
+      }
+      chats: {
+        Row: Chat
+        Insert: Omit<Chat, 'id' | 'created_at'>
+        Update: Partial<Chat>
+      }
+    }
+  }
+}
