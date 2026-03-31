@@ -1,0 +1,84 @@
+import React, { useRef } from 'react'
+import { ATTACHMENTS } from '../types/whatsapp'
+import type { MessageType } from '../types/database'
+
+interface Props {
+  open: boolean
+  onClose: () => void
+  onFile: (file: File, type: MessageType) => void
+  onLocation: () => void
+  onPoll: () => void
+  onEvent: () => void
+  onContact: () => void
+}
+
+export function AttachmentMenu({ open, onClose, onFile, onLocation, onPoll, onEvent, onContact }: Props) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const activeType = useRef<MessageType>('document')
+
+  if (!open) return null
+
+  const handleClick = (type: string, accept?: string) => {
+    if (type === 'location') { onLocation(); onClose(); return }
+    if (type === 'poll')     { onPoll();     onClose(); return }
+    if (type === 'event')    { onEvent();    onClose(); return }
+    if (type === 'contact')  { onContact();  onClose(); return }
+
+    const map: Record<string, MessageType> = {
+      gallery: 'image', camera: 'image',
+      document: 'document', audio: 'audio'
+    }
+    activeType.current = map[type] || 'document'
+
+    if (fileRef.current) {
+      fileRef.current.accept = accept || '*'
+      fileRef.current.click()
+    }
+    onClose()
+  }
+
+  return (
+    <>
+      {/* Overlay */}
+      <div
+        className="fixed inset-0 z-40"
+        onClick={onClose}
+      />
+
+      {/* Menu */}
+      <div className="absolute bottom-20 left-4 z-50 bg-gemini-card border border-gemini-border rounded-2xl p-4 shadow-2xl w-72">
+        <div className="grid grid-cols-4 gap-4">
+          {ATTACHMENTS.map(a => (
+            <button
+              key={a.type}
+              onClick={() => handleClick(a.type, a.accept)}
+              className="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-gemini-border transition-colors"
+            >
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ background: a.color + '22' }}
+              >
+                <i
+                  className={`fa-solid ${a.icon} text-xl`}
+                  style={{ color: a.color }}
+                />
+              </div>
+              <span className="text-xs text-gemini-muted">{a.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <input
+        ref={fileRef}
+        type="file"
+        className="hidden"
+        onChange={e => {
+          const file = e.target.files?.[0]
+          if (file) onFile(file, activeType.current)
+          e.target.value = ''
+        }}
+      />
+    </>
+  )
+}
