@@ -1,0 +1,34 @@
+import { useEffect, useRef } from 'react'
+
+export function usePush() {
+  const swRef = useRef<ServiceWorkerRegistration | null>(null)
+
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return
+
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      swRef.current = reg
+      if (Notification.permission === 'default') {
+        Notification.requestPermission()
+      }
+    })
+  }, [])
+
+  const notificar = (titulo: string, corpo: string, avatar?: string) => {
+    if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300])
+    window.OioSom?.mensagem()
+
+    if (swRef.current && Notification.permission === 'granted') {
+      swRef.current.showNotification(titulo, {
+        body: corpo,
+        icon: avatar || 'https://ui-avatars.com/api/?name=OIO&background=1a73e8&color=fff',
+        badge: 'https://ui-avatars.com/api/?name=OIO&background=1a73e8&color=fff',
+        vibrate: [300, 100, 300, 100, 300],
+        tag: 'oio-' + Date.now(),
+        renotify: true
+      } as NotificationOptions)
+    }
+  }
+
+  return { notificar }
+}
