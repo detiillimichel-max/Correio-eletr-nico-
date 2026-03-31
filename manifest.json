@@ -1,0 +1,22 @@
+{
+  "name": "OIO Chat",
+  "short_name": "OIO",
+  "description": "Clone WhatsApp estilo Gemini",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#1a73e8",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://ui-avatars.com/api/?name=OIO&size=192&background=1a73e8&color=fff",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://ui-avatars.com/api/?name=OIO&size=512&background=1a73e8&color=fff",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
