@@ -1,0 +1,124 @@
+import { useEffect, useState, useCallback } from 'react'
+import { supabase } from '../lib/supabase'
+import type { Message, MessageType } from '../types/database'
+
+export function useMessages(myName: string, contactName: string) {
+  const [messages, setMessages] = useState<Message[]>([])
+  const [loading, setLoading] = useState(true)
+
+  // Carrega mensagens iniciais
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from('messages')
+      .select('*')
+      .or(
+        `and(sender_id.eq.${myName},receiver_id.eq.${contactName}),` +
+        `and(sender_id.eq.${contactName},receiver_id.eq.${myName})`
+      )
+      .order('created_at', { ascending: true })
+
+    if (data) setMessages(data as Message[])
+    setLoading(false)
+  }, [myName, contactName])
+
+  // Realtime — escuta novas mensagens
+  useEffect(() => {
+    load()
+
+    const channel = supabase
+      .channel(`chat-${myName}-${contactName}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `receiver_id=eq.${myName}`
+        },
+        payload => {
+          const nova = payload.new as Message
+          setMessages(prev => [...prev, nova])
+          // Som + vibração ao receber
+          window.OioSom?.mensagem()
+          if (navigator.vibrate) navigator.vibrate([200, 100, 200])
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [myName, contactName, load])
+
+  // Envia mensagem de texto
+  const sendMessage = useCallback(async (content: string) => {
+    if (!content.trim()) return
+    await supabase.from('messages').insert({
+      sender_id: myName,
+      receiver_id: contactName,
+      content,
+      type: 'text',
+      file_url: null,
+      duration: null,
+      is_read: false
+    })
+    window.OioSom?.clique()
+  }, [myName, contactName])
+
+  // Envia arquivo (imagem, vídeo, doc, áudio)
+  const sendFile = useCallback(async (file: File, type: MessageType) => {
+    const fileName = `${Date.now()}_${file.name.replace(/\s/g, '_')}`
+    const bucket = type === 'audio' ? 'audios' : 'midias'
+
+    const { error } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, file)
+
+    if (error) { console.error('Upload erro:', error); return }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(fileName)
+
+    await supabase.from('messages').insert({
+      sender_id: myName,
+      receiver_id: contactName,
+      content: file.name,
+      type,
+      file_url: publicUrl,
+      duration: null,
+      is_read: false
+    })
+    window.OioSom?.clique()
+  }, [myName, contactName])
+
+  // Envia localização
+  const sendLocation = useCallback(async () => {
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const { latitude, longitude } = pos.coords
+      const content = `${latitude},${longitude}`
+      await supabase.from('messages').insert({
+        sender_id: myName,
+        receiver_id: contactName,
+        content,
+        type: 'location',
+        file_url: `https://maps.google.com/?q=${latitude},${longitude}`,
+        duration: null,
+        is_read: false
+      })
+    })
+  }, [myName, contactName])
+
+  // Registra chamada
+  const registerCall = useCallback(async (type: 'call_made' | 'call_missed') => {
+    await supabase.from('messages').insert({
+      sender_id: myName,
+      receiver_id: contactName,
+      content: type === 'call_made' ? 'Chamada efetuada' : 'Chamada perdida',
+      type,
+      file_url: null,
+      duration: null,
+      is_read: false
+    })
+  }, [myName, contactName])
+
+  return { messages, loading, sendMessage, sendFile, sendLocation, registerCall }
+}
