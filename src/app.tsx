@@ -1,51 +1,63 @@
 import { useState, useEffect } from 'react';
 import { ProfileDrawer } from './components/ProfileDrawer';
-import { getUserLocation } from './services/locationService';
+import { FriendList } from './components/FriendList';
+import { ImportButton } from './components/ImportButton'; // O botão "="
+import { getFriends } from './services/friendService';
 
 function App() {
-  // Estado para controlar se a gaveta de perfil está aberta
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [friends, setFriends] = useState<any[]>([]);
   
-  // Dados do usuário (Estilo Orkut/Gemini)
-  const [userData, setUserData] = useState({
+  const [userData] = useState({
     name: 'Michel (OIO ONE)',
-    photo: '', // Inicia vazio para usar o padrão
-    location: 'Carregando...',
-    bio: 'Desenvolvendo o futuro do OIO ONE pelo celular! 📱🚀',
-    game: 'Vibe-app / Retro-gaming'
+    location: 'Bom Jesus dos Perdões, SP',
+    bio: 'Desenvolvendo o futuro do OIO ONE pelo celular! 📱🚀'
   });
 
-  // Busca a localização assim que o app inicia
+  // Carrega os amigos iniciais
   useEffect(() => {
-    getUserLocation().then((loc: any) => {
-      setUserData(prev => ({ ...prev, location: loc }));
-    });
+    getFriends().then((data: any) => setFriends(data));
   }, []);
 
+  // Função que recebe o contacto importado da agenda do telemóvel
+  const handleImportedContact = (contact: any) => {
+    const newFriend = {
+      id: Date.now(), // Gera um ID único baseado no tempo
+      name: contact.name,
+      status: `Contacto: ${contact.phone}`,
+      photo: '',
+      initial: contact.name.charAt(0).toUpperCase()
+    };
+    // Adiciona o novo amigo ao topo da lista
+    setFriends([newFriend, ...friends]);
+  };
+
   return (
-    <div style={{ background: '#000', minHeight: '100vh', color: '#fff' }}>
+    <div style={{ background: '#000', minHeight: '100vh', color: '#fff', position: 'relative' }}>
       
-      {/* CABEÇALHO SIMPLES */}
       <header style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>OIO ONE</h2>
-        {/* Clique aqui para abrir o perfil estilo Orkut */}
+        <h2 style={{ fontWeight: '300', letterSpacing: '1px' }}>OIO ONE</h2>
         <div 
-          onClick={() => setIsProfileOpen(true)}
-          style={{ 
-            width: '45px', height: '45px', borderRadius: '50%', 
-            background: '#007bff', display: 'flex', alignItems: 'center', 
-            justifyContent: 'center', fontWeight: 'bold', cursor: 'pointer' 
-          }}
+          onClick={() => setIsProfileOpen(true)} 
+          style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#007bff', display: 'flex', alignItems: 'center', justify-content: 'center', cursor: 'pointer', fontWeight: 'bold' }}
         >
           MI
         </div>
       </header>
 
-      <main style={{ padding: '20px', textAlign: 'center' }}>
-        <p style={{ color: '#666' }}>Toque no seu avatar para ver seu perfil completo.</p>
+      <main style={{ paddingBottom: '80px' }}>
+        <FriendList 
+          friends={friends} 
+          onFriendClick={(f: any) => alert(`Abrir chat com: ${f.name}`)} 
+        />
       </main>
 
-      {/* COMPONENTE DA GAVETA QUE VOCÊ CRIOU */}
+      {/* BOTÃO "=" FLUTUANTE NO CANTO INFERIOR DIREITO */}
+      <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 100 }}>
+        <ImportButton onImport={handleImportedContact} />
+      </div>
+
+      {/* GAVETA DE PERFIL (ORKUT STYLE) */}
       <ProfileDrawer 
         isOpen={isProfileOpen} 
         onClose={() => setIsProfileOpen(false)} 
