@@ -3,101 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OIO ONE - Vibe Mensagens</title>
+    <title>OIO ONE - Mensagens</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css">
+
+    <style>
+        /* CSS de emergência dentro do HTML para garantir que não fique branco */
+        body { 
+            background-color: #000 !important; 
+            color: white !important; 
+            margin: 0; 
+            font-family: sans-serif; 
+            overflow: hidden; 
+        }
+        
+        #contact-list { padding: 20px; height: 100vh; overflow-y: auto; background: #000; }
+        
+        .contact-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar-circle {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: #007bff;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+        }
+
+        /* GAVETA GEMINI */
+        #glass-drawer {
+            position: fixed;
+            bottom: -105%;
+            left: 0;
+            width: 100%;
+            height: 96vh;
+            background: rgba(15, 15, 15, 0.98);
+            backdrop-filter: blur(30px);
+            border-radius: 30px 30px 0 0;
+            transition: bottom 0.5s ease-out;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #glass-drawer.active { bottom: 0; }
+
+        .drawer-handle {
+            width: 50px; height: 6px; background: rgba(255,255,255,0.2);
+            border-radius: 10px; margin: 20px auto;
+        }
+
+        .chat-content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+
+        .chat-input-area { padding: 20px 20px 40px 20px; display: flex; align-items: center; gap: 10px; }
+
+        .chat-pill {
+            flex: 1; background: rgba(255,255,255,0.1);
+            border-radius: 40px; padding: 12px 20px;
+            display: flex; align-items: center;
+        }
+
+        .chat-pill input { flex: 1; background: transparent; border: none; color: white; outline: none; }
+
+        .send-button {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: #007bff; border: none; color: white;
+        }
+
+        .message-bubble {
+            max-width: 80%; padding: 12px 16px; border-radius: 18px;
+            background: #1e1e1e; align-self: flex-end;
+        }
+    </style>
 </head>
 <body>
 
     <main id="contact-list">
-        <h2 style="padding: 10px; font-weight: 300;">Mensagens</h2>
+        <h2 style="font-weight: 300;">Mensagens</h2>
         
-        <div class="contact-item" onclick="openChat('Gab Gabriela', 'gab.gabriela1914')">
-            <div class="contact-avatar">GA</div>
-            <div class="contact-info">
+        <div class="contact-card" onclick="openChat('gab.gabriela1914')">
+            <div class="avatar-circle">GA</div>
+            <div>
                 <strong>gab.gabriela1914</strong>
-                <p style="font-size: 12px; color: #888; margin: 5px 0 0;">Também te amo muito</p>
+                <div style="color: #888; font-size: 13px;">Também te amo muito</div>
             </div>
         </div>
 
-        <div class="contact-item" onclick="openChat('Michel', 'detiillimichel')">
-            <div class="contact-avatar" style="background: #e91e63;">MI</div>
-            <div class="contact-info">
+        <div class="contact-card" onclick="openChat('detiillimichel')">
+            <div class="avatar-circle" style="background: #e91e63;">MI</div>
+            <div>
                 <strong>detiillimichel</strong>
-                <p style="font-size: 12px; color: #888; margin: 5px 0 0;">Vibe Mensagens ativa!</p>
+                <div style="color: #888; font-size: 13px;">Vibe Mensagens ativa!</div>
             </div>
         </div>
     </main>
 
     <div id="glass-drawer">
         <div class="drawer-handle" onclick="closeChat()"></div>
-        
-        <div class="chat-header" style="text-align: center; padding: 10px;">
-            <span id="chat-user-name" style="font-weight: bold; color: #007bff;">Nome do Contato</span>
-        </div>
+        <div style="text-align: center; padding: 10px; font-weight: bold; color: #007bff;" id="target-user">gab.gabriela1914</div>
 
         <div id="chat-content" class="chat-content">
-            <div style="text-align: center; color: #555; margin-top: 50px;">
-                Inicie uma conversa segura...
-            </div>
+            <div style="text-align: center; color: #444; margin-top: 20px;">Conversa segura</div>
         </div>
 
-        <div class="chat-input-container">
+        <div class="chat-input-area">
             <div class="chat-pill">
-                <button class="icon-btn-left">
-                    <i class="fas fa-plus"></i>
-                </button>
-
-                <input type="text" id="message-input" placeholder="Sua vibe..." class="input-field">
-
-                <div class="action-icons">
-                    <button class="icon-btn-right" title="Gravar Áudio">
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                    <button class="icon-btn-right" title="Chamada de Vídeo" onclick="window.open('https://meet.google.com/new', '_blank')">
-                        <i class="fas fa-video"></i>
-                    </button>
-                </div>
+                <i class="fas fa-plus" style="margin-right: 10px; color: #888;"></i>
+                <input type="text" id="main-input" placeholder="Sua vibe...">
+                <i class="fas fa-microphone" style="margin-left: 10px; color: #888;"></i>
+                <i class="fas fa-video" style="margin-left: 15px; color: #888;" onclick="window.open('https://meet.google.com/new')"></i>
             </div>
-            
-            <button class="send-btn" onclick="sendMessage()">
+            <button class="send-button" onclick="sendMessage()">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
 
     <script>
-        const drawer = document.getElementById('glass-drawer');
-        const chatUserName = document.getElementById('chat-user-name');
-
-        // FUNÇÃO PARA ABRIR A GAVETA
-        function openChat(name, id) {
-            chatUserName.innerText = id;
-            drawer.classList.add('active');
+        function openChat(name) {
+            document.getElementById('target-user').innerText = name;
+            document.getElementById('glass-drawer').classList.add('active');
         }
-
-        // FUNÇÃO PARA FECHAR A GAVETA
         function closeChat() {
-            drawer.classList.remove('active');
+            document.getElementById('glass-drawer').classList.remove('active');
         }
-
-        // FUNÇÃO PARA SIMULAR ENVIO DE MENSAGEM
         function sendMessage() {
-            const input = document.getElementById('message-input');
+            const input = document.getElementById('main-input');
             const content = document.getElementById('chat-content');
-            
             if(input.value.trim() !== "") {
-                const msg = document.createElement('div');
-                msg.style.cssText = "background: rgba(0,123,255,0.2); padding: 10px; border-radius: 15px; margin: 10px 0; align-self: flex-end; max-width: 80%; margin-left: auto;";
-                msg.innerText = input.value;
-                content.appendChild(msg);
+                const b = document.createElement('div');
+                b.className = "message-bubble";
+                b.innerText = input.value;
+                content.appendChild(b);
                 input.value = "";
                 content.scrollTop = content.scrollHeight;
             }
         }
     </script>
-
 </body>
 </html>
