@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
-import './index.css' // Se não tiver esse arquivo, pode apagar essa linha
+import app from './app' // Importando o 'app' minúsculo que você criou
+import './index.css' // Certifique-se de que este arquivo existe para o estilo
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <app />
+  </React.StrictMode>,
 )
