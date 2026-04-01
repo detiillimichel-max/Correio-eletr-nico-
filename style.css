@@ -107,3 +107,73 @@ body {
     font-size: 24px;
     cursor: pointer;
 }
+
+/* CONTAINER DA BARRA (FIXO NA BASE DA GAVETA) */
+.chat-input-container {
+    position: absolute;
+    bottom: 25px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    box-sizing: border-box;
+    gap: 10px;
+}
+
+/* A "PÍLULA" DE VIDRO */
+.chat-pill {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08); /* Vidro bem sutil */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    padding: 8px 15px;
+    backdrop-filter: blur(15px);
+}
+
+/* CAMPO DE TEXTO */
+.input-field {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px;
+    outline: none;
+}
+
+/* BOTÕES DE ÍCONES */
+.icon-btn-left, .icon-btn-right {
+    background: none;
+    border: none;
+    color: #aaa; /* Cor neutra para não poluir */
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.icon-btn-left:active, .icon-btn-right:active {
+    color: #007bff; /* Brilho azul ao tocar */
+}
+
+.action-icons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* BOTÃO ENVIAR (CIRCULAR AO LADO) */
+.send-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #007bff;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
