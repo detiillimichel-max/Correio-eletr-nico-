@@ -1,45 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="https://ui-avatars.com/api/?name=OIO&background=1a73e8&color=fff" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Correio Eletrônico</title>
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#0f0f1a" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OIO ONE - Vibe Mensagens</title>
     
-    <!-- Ícones e Fontes do Google -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Tailwind via CDN para funcionar rápido no seu teste -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              gemini: {
-                blue: '#1a73e8',
-                purple: '#7c3aed',
-                dark: '#0f0f1a',
-                card: '#1a1a2e',
-                border: '#2a2a3e',
-                text: '#e2e8f0',
-                muted: '#64748b',
-                bubble: '#1e3a5f',
-                mine: '#1a3a6e',
-              }
-            }
-          }
-        }
-      }
-    </script>
-  </head>
-  <body class="bg-gemini-dark text-gemini-text">
-    <div id="root"></div>
-    <!-- Esse script abaixo liga o HTML ao seu código React -->
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+    <main id="contact-list">
+        <h2 style="padding: 10px; font-weight: 300;">Mensagens</h2>
+        
+        <div class="contact-item" onclick="openChat('Gab Gabriela', 'gab.gabriela1914')">
+            <div class="contact-avatar">GA</div>
+            <div class="contact-info">
+                <strong>gab.gabriela1914</strong>
+                <p style="font-size: 12px; color: #888; margin: 5px 0 0;">Também te amo muito</p>
+            </div>
+        </div>
+
+        <div class="contact-item" onclick="openChat('Michel', 'detiillimichel')">
+            <div class="contact-avatar" style="background: #e91e63;">MI</div>
+            <div class="contact-info">
+                <strong>detiillimichel</strong>
+                <p style="font-size: 12px; color: #888; margin: 5px 0 0;">Vibe Mensagens ativa!</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="glass-drawer">
+        <div class="drawer-handle" onclick="closeChat()"></div>
+        
+        <div class="chat-header" style="text-align: center; padding: 10px;">
+            <span id="chat-user-name" style="font-weight: bold; color: #007bff;">Nome do Contato</span>
+        </div>
+
+        <div id="chat-content" class="chat-content">
+            <div style="text-align: center; color: #555; margin-top: 50px;">
+                Inicie uma conversa segura...
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="chat-pill">
+                <button class="icon-btn-left">
+                    <i class="fas fa-plus"></i>
+                </button>
+
+                <input type="text" id="message-input" placeholder="Sua vibe..." class="input-field">
+
+                <div class="action-icons">
+                    <button class="icon-btn-right" title="Gravar Áudio">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="icon-btn-right" title="Chamada de Vídeo" onclick="window.open('https://meet.google.com/new', '_blank')">
+                        <i class="fas fa-video"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <button class="send-btn" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const drawer = document.getElementById('glass-drawer');
+        const chatUserName = document.getElementById('chat-user-name');
+
+        // FUNÇÃO PARA ABRIR A GAVETA
+        function openChat(name, id) {
+            chatUserName.innerText = id;
+            drawer.classList.add('active');
+        }
+
+        // FUNÇÃO PARA FECHAR A GAVETA
+        function closeChat() {
+            drawer.classList.remove('active');
+        }
+
+        // FUNÇÃO PARA SIMULAR ENVIO DE MENSAGEM
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const content = document.getElementById('chat-content');
+            
+            if(input.value.trim() !== "") {
+                const msg = document.createElement('div');
+                msg.style.cssText = "background: rgba(0,123,255,0.2); padding: 10px; border-radius: 15px; margin: 10px 0; align-self: flex-end; max-width: 80%; margin-left: auto;";
+                msg.innerText = input.value;
+                content.appendChild(msg);
+                input.value = "";
+                content.scrollTop = content.scrollHeight;
+            }
+        }
+    </script>
+
+</body>
+</html>
